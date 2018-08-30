@@ -80,25 +80,45 @@ public class TxtFileChooser extends WizardPage {
 		Text res_name = new Text(container, SWT.READ_ONLY);
 		res_name.setLayoutData(gridData);
 		
-		new Label(container, SWT.NONE).setText("Select Original Data");
-		Combo combo = new Combo(container, SWT.SINGLE | SWT.READ_ONLY);
-		combo.setLayoutData(gridData);
 		
-		combo.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetSelected(SelectionEvent a_e) {
-				// TODO Auto-generated method stub
-				selectMSProperty(combo);	
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent a_e) {
-				// TODO Auto-generated method stub
-
-			}
-
-		});
+//		Combo combo = new Combo(container, SWT.SINGLE | SWT.READ_ONLY);
+//		combo.setLayoutData(gridData);
+//		
+//		combo.addSelectionListener(new SelectionListener() {
+//
+//			@Override
+//			public void widgetSelected(SelectionEvent a_e) {
+//				// TODO Auto-generated method stub
+//				selectMSProperty(combo);	
+//			}
+//
+//			@Override
+//			public void widgetDefaultSelected(SelectionEvent a_e) {
+//				// TODO Auto-generated method stub
+//
+//			}
+//
+//		});
+		
+//		new Label(container, SWT.NONE).setText("Select Original Data");
+//		Combo combo = new Combo(container, SWT.SINGLE | SWT.READ_ONLY);
+//		combo.setLayoutData(gridData);
+//		
+//		combo.addSelectionListener(new SelectionListener() {
+//
+//			@Override
+//			public void widgetSelected(SelectionEvent a_e) {
+//				// TODO Auto-generated method stub
+//				selectMSProperty(combo);	
+//			}
+//
+//			@Override
+//			public void widgetDefaultSelected(SelectionEvent a_e) {
+//				// TODO Auto-generated method stub
+//
+//			}
+//
+//		});
 
 		//Label dummy = new Label(container, SWT.NONE);
 		
@@ -117,7 +137,9 @@ public class TxtFileChooser extends WizardPage {
 				Entry entry = select();
 				form.setEntry(entry);
 				getContainer().updateButtons();
-				updateSelection(entry_name, res_name, combo);
+				//updateSelection(entry_name, res_name, combo);
+				
+				updateSelection(entry_name, res_name, null);
 			}
 
 			@Override
@@ -157,8 +179,9 @@ public class TxtFileChooser extends WizardPage {
 
 		});
 		
-		updateSelection(entry_name, res_name, combo);
+		// updateSelection(entry_name, res_name, combo);
 
+		updateSelection(entry_name, res_name, null);
 		setControl(container);
 	}
 
