@@ -9,7 +9,12 @@
 package edu.brandeis.glycodenovo.wizard;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,6 +42,8 @@ import org.grits.toolbox.core.datamodel.property.Property;
 import org.grits.toolbox.core.utilShare.ListenerFactory;
 import org.grits.toolbox.entry.ms.property.MassSpecProperty;
 import org.grits.toolbox.entry.ms.property.datamodel.MSPropertyDataFile;
+import org.grits.toolbox.ms.file.FileCategory;
+import org.grits.toolbox.ms.file.MSFileInfo;
 
 import edu.brandeis.glycodenovo.datamodel.SettingForm;
 
@@ -54,6 +61,7 @@ public class TxtFileChooser extends WizardPage {
 		setTitle("Welcome");
 		this.form = form;
 		// TODO Auto-generated constructor stub
+		// annotationFiles = new
 	}
 
 	@Override
@@ -79,49 +87,29 @@ public class TxtFileChooser extends WizardPage {
 		res_label.setText("Result Name");
 		Text res_name = new Text(container, SWT.READ_ONLY);
 		res_name.setLayoutData(gridData);
-		
-		
-//		Combo combo = new Combo(container, SWT.SINGLE | SWT.READ_ONLY);
-//		combo.setLayoutData(gridData);
-//		
-//		combo.addSelectionListener(new SelectionListener() {
-//
-//			@Override
-//			public void widgetSelected(SelectionEvent a_e) {
-//				// TODO Auto-generated method stub
-//				selectMSProperty(combo);	
-//			}
-//
-//			@Override
-//			public void widgetDefaultSelected(SelectionEvent a_e) {
-//				// TODO Auto-generated method stub
-//
-//			}
-//
-//		});
-		
-//		new Label(container, SWT.NONE).setText("Select Original Data");
-//		Combo combo = new Combo(container, SWT.SINGLE | SWT.READ_ONLY);
-//		combo.setLayoutData(gridData);
-//		
-//		combo.addSelectionListener(new SelectionListener() {
-//
-//			@Override
-//			public void widgetSelected(SelectionEvent a_e) {
-//				// TODO Auto-generated method stub
-//				selectMSProperty(combo);	
-//			}
-//
-//			@Override
-//			public void widgetDefaultSelected(SelectionEvent a_e) {
-//				// TODO Auto-generated method stub
-//
-//			}
-//
-//		});
 
-		//Label dummy = new Label(container, SWT.NONE);
-		
+		// new Label(container, SWT.NONE).setText("Select Original Data");
+		// Combo combo = new Combo(container, SWT.SINGLE | SWT.READ_ONLY);
+		// combo.setLayoutData(gridData);
+
+		// combo.addSelectionListener(new SelectionListener() {
+		//
+		// @Override
+		// public void widgetSelected(SelectionEvent a_e) {
+		// // TODO Auto-generated method stub
+		// selectMSProperty(combo);
+		// }
+		//
+		// @Override
+		// public void widgetDefaultSelected(SelectionEvent a_e) {
+		// // TODO Auto-generated method stub
+		//
+		// }
+		//
+		// });
+
+	//	Label dummy = new Label(container, SWT.NONE);
+
 		Label file_name_label = new Label(container, SWT.NONE);
 		file_name_label.setText("File Name");
 		Text file_name = new Text(container, SWT.READ_ONLY);
@@ -137,9 +125,9 @@ public class TxtFileChooser extends WizardPage {
 				Entry entry = select();
 				form.setEntry(entry);
 				getContainer().updateButtons();
-				//updateSelection(entry_name, res_name, combo);
-				
-				updateSelection(entry_name, res_name, null);
+				// updateSelection(entry_name, res_name, combo);
+				updateSelection(entry_name, res_name);
+
 			}
 
 			@Override
@@ -148,8 +136,7 @@ public class TxtFileChooser extends WizardPage {
 
 			}
 
-		});	
-		
+		});
 
 		Button choose = new Button(container, SWT.PUSH);
 		choose.setText("choose txt file");
@@ -178,11 +165,12 @@ public class TxtFileChooser extends WizardPage {
 			}
 
 		});
-		
+
 		// updateSelection(entry_name, res_name, combo);
 
-		updateSelection(entry_name, res_name, null);
+		updateSelection(entry_name, res_name);
 		setControl(container);
+		
 	}
 
 	/**
@@ -239,13 +227,36 @@ public class TxtFileChooser extends WizardPage {
 		descriptionText.addTraverseListener(ListenerFactory.getTabTraverseListener());
 		descriptionText.addKeyListener(ListenerFactory.getCTRLAListener());
 	}
-	
+
 	private void updateSelection(Text entry_name, Text res_name, Combo combo) {
 		if (form.getEntry() != null) {
 			entry_name.setText(form.getEntry().getDisplayName());
 			res_name.setText(form.getEntry().getDisplayName() + ".GlycoDeNovo");
 			form.setResName(res_name.getText());
 			updateMSProperty(combo);
+
+			// MSPropertyDataFile msPropertyDataFile = getMSPropertyDataFile();
+			//
+			// annotationFiles = new ArrayList<>();
+			//
+			// annotationFiles.add(msPropertyDataFile);
+
+		} else {
+			entry_name.setText("");
+			res_name.setText("");
+			form.setResName(null);
+		}
+	}
+
+	private void updateSelection(Text entry_name, Text res_name) {
+		if (form.getEntry() != null) {
+			entry_name.setText(form.getEntry().getDisplayName());
+			res_name.setText(form.getEntry().getDisplayName() + ".GlycoDeNovo");
+			form.setResName(res_name.getText());
+
+			getMSPropertyDataFile();
+
+			// updateMSProperty(combo);
 		} else {
 			entry_name.setText("");
 			res_name.setText("");
@@ -274,26 +285,85 @@ public class TxtFileChooser extends WizardPage {
 			Property prop = form.getEntry().getProperty();
 			if (prop instanceof MassSpecProperty) {
 				List<MSPropertyDataFile> files = ((MassSpecProperty) prop).getMassSpecMetaData().getAnnotationFiles();
+
 				for (MSPropertyDataFile propertyDataFile : files) {
 					annotationFiles.add(propertyDataFile);
 				}
 			}
 		}
-		//System.out.println(annotationFiles.size());
+		// System.out.println(annotationFiles.size());
 	}
-	
+
+	private void getMSPropertyDataFile() {
+		// String s = getClass().getName();
+
+		Path path;
+//		MSPropertyDataFile mzXMLFile = null;
+//		
+//		MSPropertyDataFile mzXMLFile = null;
+
+	//	try {
+
+			String uri = this.getClass().getProtectionDomain().getCodeSource().getLocation().toString();
+			
+			System.out.println("uri = " + uri);
+
+			uri = uri.replaceAll(" ", "%20");
+			
+			System.out.println("after uri = " + uri);
+
+			
+			try {
+				URI uRI = new URI(uri);
+				path = Paths.get(uRI);
+
+				String mzxmlFileName = path.toString() + "data/sample.mzXML";
+
+				System.out.println(path);
+
+				MSPropertyDataFile 	mzXMLFile = new MSPropertyDataFile(mzxmlFileName, MSFileInfo.MSFORMAT_MZXML_CURRENT_VERSION, "mzXML");
+					
+				Property prop = form.getEntry().getProperty();
+				if (prop instanceof MassSpecProperty) {
+					List<MSPropertyDataFile> files = ((MassSpecProperty) prop).getMassSpecMetaData()
+							.getAnnotationFiles();
+
+					if (!files.contains(mzXMLFile)) {
+						files.add(mzXMLFile);
+					}
+				}
+				
+				form.setDataFile(mzXMLFile);
+
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			
+	//	} 
+		
+//		catch (URISyntaxException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+
+		
+
+	}
+
 	private void selectMSProperty(Combo combo) {
 		form.setDataFile(annotationFiles.get(combo.getSelectionIndex()));
 		System.out.println(form.getDataFile().getName());
 	}
-	
+
 	private void updateMSProperty(Combo combo) {
 		if (form.getEntry() == null) {
 			MessageDialog.openError(getContainer().getShell(), "Error", "Please select entry first");
 		} else {
 			combo.deselectAll();
 			getAnnotationFilesForEntry();
-			for (MSPropertyDataFile file: annotationFiles) {
+			for (MSPropertyDataFile file : annotationFiles) {
 				combo.add(file.getName());
 			}
 		}
